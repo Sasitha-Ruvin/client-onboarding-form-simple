@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Client Onboarding Form
 
-## Getting Started
+A Next.js client onboarding form with React Hook Form and Zod validation.
 
-First, run the development server:
+## Setup
 
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create `.env.local` file:
+```env
+NEXT_PUBLIC_ONBOARD_URL=https://jsonplaceholder.typicode.com/posts
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000)
 
-## Learn More
+## RHF + Zod Integration
 
-To learn more about Next.js, take a look at the following resources:
+The form uses React Hook Form with Zod validation through `@hookform/resolvers/zod`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```typescript
+// Schema definition with Zod
+const onboardingSchema = z.object({
+  fullName: z.string().min(2).max(80).regex(/^[a-zA-Z\s'-]+$/),
+  email: z.string().email(),
+  companyName: z.string().min(2).max(100),
+  services: z.array(z.enum(['UI/UX', 'Branding', 'Web Dev', 'Mobile App'])).min(1),
+  budgetUsd: z.number().int().min(100).max(1000000).optional(),
+  projectStartDate: z.string().refine(date => new Date(date) >= new Date()),
+  acceptTerms: z.boolean().refine(val => val === true)
+});
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+// Form setup with RHF + Zod resolver
+const {
+  register,
+  handleSubmit,
+  formState: { errors }
+} = useForm<OnboardingFormData>({
+  resolver: zodResolver(onboardingSchema)
+});
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The `zodResolver` automatically validates form data against the Zod schema and provides type-safe error messages.
