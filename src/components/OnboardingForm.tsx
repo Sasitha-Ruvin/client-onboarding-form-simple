@@ -44,7 +44,7 @@ export function OnboardingForm() {
     },
   });
 
-  // Pre-fill form from query parameters (bonus feature)
+  // Pre-fill form from query parameters 
   useEffect(() => {
     const serviceParam = searchParams.get('service');
     if (serviceParam && serviceOptions.includes(serviceParam as (typeof serviceOptions)[number])) {
@@ -62,7 +62,6 @@ export function OnboardingForm() {
     }
   }, [searchParams, setValue]);
 
-  // Get today's date in YYYY-MM-DD format for min date
   const todayDate = new Date().toISOString().split('T')[0];
 
   const onSubmit = async (data: OnboardingFormData) => {
